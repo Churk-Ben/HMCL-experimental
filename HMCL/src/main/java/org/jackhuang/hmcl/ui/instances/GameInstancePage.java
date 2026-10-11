@@ -102,6 +102,18 @@ public class GameInstancePage extends DecoratorAnimatedPage implements Decorator
         tab = new TabHeader(transitionPane, gameSettingsTab, installerListTab, modListTab, resourcePackTab, worldListTab, schematicsTab, screenshotsTab, serverListTab);
         tab.select(gameSettingsTab);
 
+        // Typing in the page searches directly, like the project view of IDEA. The handler is
+        // installed here because the focus usually rests on the navigation box rather than on
+        // the list itself.
+        FXUtils.onKeyTyped(this, character -> {
+            Node content = transitionPane.getCurrentNode();
+            if (content instanceof ModListPage page) {
+                page.search(character);
+            } else if (content instanceof ResourcePackListPage page) {
+                page.search(character);
+            }
+        });
+
         addEventHandler(Navigator.NavigationEvent.NAVIGATED, this::onNavigated);
 
         addEventHandler(WorkingDirChangedEvent.EVENT_TYPE, event -> {
