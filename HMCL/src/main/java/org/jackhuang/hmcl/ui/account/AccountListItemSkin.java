@@ -24,7 +24,6 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.Tooltip;
@@ -58,7 +57,6 @@ public final class AccountListItemSkin extends SkinBase<AccountListItem> {
         super(skinnable);
 
         BorderPane root = new BorderPane();
-        root.setCursor(Cursor.HAND);
         FXUtils.onClicked(root, skinnable::fire);
 
         JFXRadioButton chkSelected = new JFXRadioButton();
