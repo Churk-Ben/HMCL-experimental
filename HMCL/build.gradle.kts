@@ -27,13 +27,14 @@ val projectConfig = PropertiesUtils.load(rootProject.file("config/project.proper
 
 val isOfficial = JenkinsUtils.IS_ON_CI || GitHubActionUtils.IS_ON_OFFICIAL_REPO
 
-val versionType = System.getenv("VERSION_TYPE") ?: if (isOfficial) "nightly" else "unofficial"
+val versionType = System.getenv("VERSION_TYPE") ?: if (isOfficial) "nightly" else "experimental"
 val versionRoot = System.getenv("VERSION_ROOT") ?: projectConfig.getProperty("versionRoot") ?: "3"
 
 /// Release channel used by the Linux packagers, shared by all package formats.
 val releaseChannel = when (versionType) {
     "stable" -> ReleaseType.STABLE
     "dev" -> ReleaseType.DEVELOPMENT
+    "experimental" -> ReleaseType.EXPERIMENTAL
     else -> ReleaseType.NIGHTLY
 }
 val launcherMainClass = "org.jackhuang.hmcl.Launcher"
@@ -44,6 +45,7 @@ val curseForgeApiKey = System.getenv("CURSEFORGE_API_KEY") ?: ""
 val launcherExe = System.getenv("HMCL_LAUNCHER_EXE") ?: ""
 
 val buildNumber = System.getenv("BUILD_NUMBER")?.toInt()
+val runNumber = System.getenv("GITHUB_RUN_NUMBER")?.toInt()
 if (buildNumber != null) {
     version = if (JenkinsUtils.IS_ON_CI && versionType == "dev") {
         "$versionRoot.0.$buildNumber"
@@ -52,12 +54,11 @@ if (buildNumber != null) {
     }
 } else {
     val shortCommit = System.getenv("GITHUB_SHA")?.lowercase()?.substring(0, 7)
-    version = if (shortCommit.isNullOrBlank()) {
-        "$versionRoot.SNAPSHOT"
-    } else if (isOfficial) {
-        "$versionRoot.dev-$shortCommit"
-    } else {
-        "$versionRoot.unofficial-$shortCommit"
+    version = when {
+        shortCommit.isNullOrBlank() -> "$versionRoot.SNAPSHOT"
+        isOfficial -> "$versionRoot.dev-$shortCommit"
+        runNumber != null -> "$versionRoot-$runNumber.exp.$shortCommit"
+        else -> "$versionRoot.unofficial-$shortCommit"
     }
 }
 
@@ -172,6 +173,10 @@ val hmclProperties = buildList {
     add("hmcl.curseforge.apikey" to curseForgeApiKey)
     add("hmcl.authlib-injector.version" to libs.authlib.injector.get().version!!)
     add("hmcl.lwjgl-unsafe-agent.version" to libs.lwjgl.unsafe.agent.get().version!!)
+    if (versionType == "experimental") {
+        projectConfig.getProperty("hmcl.update_source.override")?.let { add("hmcl.update_source.override" to it) }
+        projectConfig.getProperty("hmcl.manual_update_url")?.let { add("hmcl.manual_update_url" to it) }
+    }
 }
 
 val hmclPropertiesFile = layout.buildDirectory.file("hmcl.properties")
