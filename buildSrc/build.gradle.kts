@@ -13,6 +13,7 @@ dependencies {
     implementation(libs.jna)
     implementation(libs.kala.compress.tar)
     implementation(libs.kala.compress.ar)
+    implementation(libs.kala.compress.cpio)
     implementation(libs.weburl)
     implementation(libs.jsoup)
     implementation("org.apache.maven:maven-artifact:3.9.16")
