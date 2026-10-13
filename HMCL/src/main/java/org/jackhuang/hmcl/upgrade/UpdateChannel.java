@@ -22,7 +22,8 @@ import org.jackhuang.hmcl.Metadata;
 public enum UpdateChannel {
     STABLE("stable"),
     DEVELOPMENT("dev"),
-    NIGHTLY("nightly");
+    NIGHTLY("nightly"),
+    EXPERIMENTAL("experimental");
 
     public final String channelName;
 
@@ -31,7 +32,9 @@ public enum UpdateChannel {
     }
 
     public static UpdateChannel getChannel() {
-        if (Metadata.isDev()) {
+        if (Metadata.isExperimental()) {
+            return EXPERIMENTAL;
+        } else if (Metadata.isDev()) {
             return DEVELOPMENT;
         } else if (Metadata.isNightly()) {
             return NIGHTLY;
