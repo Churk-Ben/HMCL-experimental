@@ -791,9 +791,10 @@ public final class Decorator {
     /// transparent scene when the stage has none. If the retained scene belongs to another stage, it is detached
     /// from that stage before being installed on `newStage`. A newly attached stage receives the persisted normal
     /// content bounds. Native frame offsets and minimum size are resolved when the stage is shown.
-    /// The native-decoration policy selects the system or custom transparent decoration. Automatic mode uses
-    /// system decoration for supported opaque windows, except for dark windows on Windows; explicit enablement
-    /// bypasses the brightness exclusion. Transparent windows always use custom decoration.
+    /// The native-decoration policy selects the system or custom transparent decoration. The default and
+    /// explicit enablement bypass the Windows dark-mode brightness exclusion; automatic mode uses system
+    /// decoration only for supported opaque windows, except for dark windows on Windows. Transparent windows
+    /// always use custom decoration.
     /// Any active window animation is cancelled and reset. Custom window
     /// animations run only with custom decoration. Window-style listeners remain active until [#detachStage()].
     /// On macOS, native application appearance updates are installed once per stage and retained across detachment.
