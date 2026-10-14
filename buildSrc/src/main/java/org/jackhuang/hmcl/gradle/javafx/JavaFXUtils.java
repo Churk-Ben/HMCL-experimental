@@ -24,6 +24,8 @@ import com.sun.jna.Platform;
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.jetbrains.annotations.NotNullByDefault;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,12 +36,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/**
- * @author Glavo
- */
+/// Configures build dependencies and tasks for HMCL's platform-specific JavaFX modules.
+@NotNullByDefault
 public final class JavaFXUtils {
     public static final String[] MODULES = {"base", "graphics", "controls"};
 
+    /// Adds JavaFX modules compatible with the build JVM when it does not bundle JavaFX.
     private static void addDependencies(Project rootProject) {
         try {
             Class.forName("javafx.application.Application", false, JavaFXUtils.class.getClassLoader());
@@ -71,12 +73,12 @@ public final class JavaFXUtils {
         else
             return;
 
-        JavaFXPlatform platform = JavaFXPlatform.ALL.get(os + "-" + arch);
+        @Nullable JavaFXPlatform platform = JavaFXPlatform.ALL.get(os + "-" + arch);
         if (platform != null) {
             int featureVersion = Runtime.version().feature();
 
-            String version;
-            if (featureVersion >= 23)
+            @Nullable String version;
+            if (featureVersion >= JavaFXVersionType.MODERN.getJavaVersion())
                 version = platform.getVersions().getOrDefault(JavaFXVersionType.MODERN, platform.getVersions().get(JavaFXVersionType.CLASSIC));
             else
                 version = platform.getVersions().get(JavaFXVersionType.CLASSIC);

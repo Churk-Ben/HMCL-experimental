@@ -45,7 +45,7 @@ final class NativeWindowDecoration {
     /// Marks nodes whose title-content descendants are already observed for native hit testing.
     private static final Object DRAG_CONFIGURED = new Object();
 
-    /// Whether the user explicitly enabled native decoration regardless of automatic platform or brightness exclusions.
+    /// Whether native decoration is enabled regardless of automatic platform or brightness exclusions.
     private final boolean forced;
 
     /// The platform-supported extended stage style.
@@ -104,9 +104,10 @@ final class NativeWindowDecoration {
     ///
     /// The `hmcl.nativeDecoration` system property takes precedence over `HMCL_NATIVE_DECORATION`.
     /// Values are case-insensitive and trimmed: `false` disables native decoration, `true` enables it on
-    /// any supported platform, and `auto` enables it only on macOS or Windows 11 and later. Missing or
-    /// unrecognized values use `auto`. All modes require JavaFX 27 or later and extended-window support.
-    /// The preference is read when this method is called and retained by the returned instance.
+    /// any supported platform, and `auto` enables it only on macOS or Windows 11 and later. Missing values
+    /// default to `true`; unrecognized values use `auto`. All modes require JavaFX 27 or later and
+    /// extended-window support. The preference is read when this method is called and retained by the
+    /// returned instance.
     ///
     /// @return the resolved support, or `null` when disabled by policy or unavailable on the runtime
     static @Nullable NativeWindowDecoration create() {
@@ -117,9 +118,14 @@ final class NativeWindowDecoration {
         if ("false".equalsIgnoreCase(preference)) {
             return null;
         }
-        boolean forced = "true".equalsIgnoreCase(preference);
-        if (!forced && preference != null && !"auto".equalsIgnoreCase(preference)) {
-            LOG.warning("Invalid native decoration preference: " + preference + "; using auto");
+        boolean forced;
+        if (preference == null || "true".equalsIgnoreCase(preference)) {
+            forced = true;
+        } else {
+            if (!"auto".equalsIgnoreCase(preference)) {
+                LOG.warning("Invalid native decoration preference: " + preference + "; using auto");
+            }
+            forced = false;
         }
         if (!forced && OperatingSystem.CURRENT_OS != OperatingSystem.MACOS
                 && !OperatingSystem.SYSTEM_VERSION.isAtLeast(OSVersion.WINDOWS_11)) {
