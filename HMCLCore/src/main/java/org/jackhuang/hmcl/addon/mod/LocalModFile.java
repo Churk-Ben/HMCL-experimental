@@ -22,8 +22,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import org.jackhuang.hmcl.addon.AddonLoader;
 import org.jackhuang.hmcl.addon.LocalAddonFile;
 import org.jackhuang.hmcl.addon.LocalAddonManager;
+import org.jackhuang.hmcl.addon.meta.CoreModInfo;
 import org.jackhuang.hmcl.addon.update.AddonUpdateConditions;
 import org.jackhuang.hmcl.util.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -50,13 +52,15 @@ public final class LocalModFile extends LocalAddonFile<LocalModFile> {
     private final String url;
     private final String fileName;
     private final String logoPath;
+    private final CoreModInfo coreModInfo;
+
     private final BooleanProperty activeProperty;
 
-    public LocalModFile(ModManager modManager, LocalMod mod, Path file, String name, Description description) {
-        this(modManager, mod, file, name, description, "", "", "", "", "");
+    public LocalModFile(ModManager modManager, LocalMod mod, Path file, String name, Description description, CoreModInfo coreModInfo) {
+        this(modManager, mod, file, name, description, "", "", "", "", "", coreModInfo);
     }
 
-    public LocalModFile(ModManager modManager, LocalMod mod, Path file, String name, Description description, String authors, String version, String gameVersion, String url, String logoPath) {
+    public LocalModFile(ModManager modManager, LocalMod mod, Path file, String name, Description description, String authors, String version, String gameVersion, String url, String logoPath, CoreModInfo coreModInfo) {
         super();
         this.modManager = modManager;
         this.mod = mod;
@@ -68,6 +72,7 @@ public final class LocalModFile extends LocalAddonFile<LocalModFile> {
         this.gameVersion = gameVersion;
         this.url = url;
         this.logoPath = logoPath;
+        this.coreModInfo = coreModInfo;
 
         activeProperty = new SimpleBooleanProperty(this, "active", !modManager.isDisabled(file)) {
             @Override
@@ -143,6 +148,15 @@ public final class LocalModFile extends LocalAddonFile<LocalModFile> {
 
     public String getLogoPath() {
         return logoPath;
+    }
+
+    public boolean isCoreMod() {
+        return !coreModInfo.isEmpty();
+    }
+
+    @NotNull
+    public CoreModInfo getCoreModInfo() {
+        return coreModInfo;
     }
 
     public BooleanProperty activeProperty() {
