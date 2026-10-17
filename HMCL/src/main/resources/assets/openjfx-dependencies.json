@@ -59,25 +59,25 @@
         "module": "javafx.base",
         "groupId": "org.openjfx",
         "artifactId": "javafx-base",
-        "version": "25",
+        "version": "27",
         "classifier": "win",
-        "sha1": "1119ad6aa5bdc83cdbfacdcfe657f1ba26c0bacc"
+        "sha1": "7d56e5f510d6e3321537c2120145e8fe61f5cddb"
       },
       {
         "module": "javafx.graphics",
         "groupId": "org.openjfx",
         "artifactId": "javafx-graphics",
-        "version": "25",
+        "version": "27",
         "classifier": "win",
-        "sha1": "773a7affb4f0422935233cfdcb16986a6b4982d5"
+        "sha1": "0c294b59c55afcc66b7aef07c07fde00923e587a"
       },
       {
         "module": "javafx.controls",
         "groupId": "org.openjfx",
         "artifactId": "javafx-controls",
-        "version": "25",
+        "version": "27",
         "classifier": "win",
-        "sha1": "d68b7b7ab8b01c94b79205423337f03995ee55ef"
+        "sha1": "819231143990768c3be759aa5a5e61ffd36ffceb"
       }
     ]
   },
@@ -141,25 +141,25 @@
         "module": "javafx.base",
         "groupId": "org.openjfx",
         "artifactId": "javafx-base",
-        "version": "25",
+        "version": "27",
         "classifier": "mac",
-        "sha1": "336b81e175591aab779d0a776fd59cd6f91822c5"
+        "sha1": "494b888fe7dfae33a7f87a939a20e45cd9d8a5bf"
       },
       {
         "module": "javafx.graphics",
         "groupId": "org.openjfx",
         "artifactId": "javafx-graphics",
-        "version": "25",
+        "version": "27",
         "classifier": "mac",
-        "sha1": "6fecc3a53eb4eba86ad434952b0996491a210727"
+        "sha1": "bc1a7635f63e849806f88cf4dd2d9be0556a34bd"
       },
       {
         "module": "javafx.controls",
         "groupId": "org.openjfx",
         "artifactId": "javafx-controls",
-        "version": "25",
+        "version": "27",
         "classifier": "mac",
-        "sha1": "60b2883c52983d8fdfb11210ddc27951d1e9ce67"
+        "sha1": "81de4b36c0c4322a01f0ff80cd44cf5a40c10114"
       }
     ]
   },
@@ -195,25 +195,25 @@
         "module": "javafx.base",
         "groupId": "org.openjfx",
         "artifactId": "javafx-base",
-        "version": "25",
+        "version": "27",
         "classifier": "mac-aarch64",
-        "sha1": "ce7b7a51e705639cc62a32e464114d6c06e1df0e"
+        "sha1": "aac4e12368c1d56d164c2a1f20b3fb3e58d112fe"
       },
       {
         "module": "javafx.graphics",
         "groupId": "org.openjfx",
         "artifactId": "javafx-graphics",
-        "version": "25",
+        "version": "27",
         "classifier": "mac-aarch64",
-        "sha1": "01914f76d206a4cdb19311445e5aff18ea9c091a"
+        "sha1": "a2f31bee7a529fce787e1a0c38ad9c349abd5b37"
       },
       {
         "module": "javafx.controls",
         "groupId": "org.openjfx",
         "artifactId": "javafx-controls",
-        "version": "25",
+        "version": "27",
         "classifier": "mac-aarch64",
-        "sha1": "a5528f381b061cb83dda75e019da3c8c4d4dc5a1"
+        "sha1": "6958393dbd041cd7d885bbd305383e711eb98116"
       }
     ]
   },
@@ -249,25 +249,25 @@
         "module": "javafx.base",
         "groupId": "org.openjfx",
         "artifactId": "javafx-base",
-        "version": "25",
+        "version": "27",
         "classifier": "linux",
-        "sha1": "1f52994bfed549d07ef52a5fa4603db17ea44fbe"
+        "sha1": "13e8cb884c619256ea147b3df800df3c89def655"
       },
       {
         "module": "javafx.graphics",
         "groupId": "org.openjfx",
         "artifactId": "javafx-graphics",
-        "version": "25",
+        "version": "27",
         "classifier": "linux",
-        "sha1": "dd1b0cfb56cec5fb3434cbdc030c02b1c8e773b2"
+        "sha1": "365bf7306757d014922900fdf214dafc46030fb1"
       },
       {
         "module": "javafx.controls",
         "groupId": "org.openjfx",
         "artifactId": "javafx-controls",
-        "version": "25",
+        "version": "27",
         "classifier": "linux",
-        "sha1": "d2a1bb11a5fb507ed5da975eee949d8f78a75d9a"
+        "sha1": "898d6364a187c0757d69f32e0326c2ebc5b45fc2"
       }
     ]
   },
@@ -331,25 +331,25 @@
         "module": "javafx.base",
         "groupId": "org.openjfx",
         "artifactId": "javafx-base",
-        "version": "25",
+        "version": "27",
         "classifier": "linux-aarch64",
-        "sha1": "e63ea8dde9078578ed470c2c057a8767d23e6eed"
+        "sha1": "be3077975f54873458a3399d3de843f0562eb7fc"
       },
       {
         "module": "javafx.graphics",
         "groupId": "org.openjfx",
         "artifactId": "javafx-graphics",
-        "version": "25",
+        "version": "27",
         "classifier": "linux-aarch64",
-        "sha1": "ea0e286fd1270afd04b4c19823469a9df64e7682"
+        "sha1": "2e650bebffba3501e8aeb0f833203d6821477271"
       },
       {
         "module": "javafx.controls",
         "groupId": "org.openjfx",
         "artifactId": "javafx-controls",
-        "version": "25",
+        "version": "27",
         "classifier": "linux-aarch64",
-        "sha1": "04f845ca609a8cd8339b9b466ed12b527a7ffa04"
+        "sha1": "3d4ce5035e5662d8380fe5e9955f1f87c070a489"
       }
     ]
   },
