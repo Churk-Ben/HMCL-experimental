@@ -131,10 +131,13 @@ public final class MainPage extends StackPane implements DecoratorPage {
 
         setPadding(new Insets(20));
 
-        if (Metadata.isNightly() || (Metadata.isDev() && !Objects.equals(Metadata.VERSION, state().getShownTips().get(ANNOUNCEMENT)))) {
+        if (Metadata.isExperimental() || Metadata.isNightly() || (Metadata.isDev() && !Objects.equals(Metadata.VERSION, state().getShownTips().get(ANNOUNCEMENT)))) {
             String title;
             String content;
-            if (Metadata.isNightly()) {
+            if (Metadata.isExperimental()) {
+                title = i18n("update.channel.experimental.title");
+                content = i18n("update.channel.experimental.hint");
+            } else if (Metadata.isNightly()) {
                 title = i18n("update.channel.nightly.title");
                 content = i18n("update.channel.nightly.hint");
             } else {
