@@ -64,6 +64,7 @@ import org.jackhuang.hmcl.util.aprilfools.Lzh;
 import org.jackhuang.hmcl.util.i18n.SupportedLocale;
 import org.jackhuang.hmcl.util.io.FileUtils;
 import org.jackhuang.hmcl.util.platform.Architecture;
+import org.jackhuang.hmcl.util.platform.JavaRunner;
 import org.jackhuang.hmcl.util.platform.OperatingSystem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -360,7 +361,7 @@ public final class Controllers {
                             }
 
                             try {
-                                Restarter.restartSelf();
+                                JavaRunner.restartSelf();
                             } catch (IOException e) {
                                 LOG.warning("Failed to restart self", e);
                             }
