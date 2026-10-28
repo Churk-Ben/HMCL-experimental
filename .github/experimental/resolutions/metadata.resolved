@@ -1,0 +1,8 @@
+    /// Upstream source repository used by launcher links.
+    public static final String REPOSITORY_URL = "https://github.com/HMCL-dev/HMCL";
+    /// Update endpoint, with runtime overrides taking precedence over the packaged channel configuration.
+    public static final String HMCL_UPDATE_URL = System.getProperty("hmcl.update_source.override",
+            JarUtils.getAttribute("hmcl.update_source.override", PUBLISH_URL + "/api/update_link"));
+    /// Release page for manual updates, using the same runtime and packaged override order.
+    public static final String MANUAL_UPDATE_URL = System.getProperty("hmcl.manual_update_url",
+            JarUtils.getAttribute("hmcl.manual_update_url", "https://github.com/HMCL-dev/HMCL/releases"));

@@ -1,0 +1,12 @@
+[
+  {
+    "layer": "pr/experimental-channel",
+    "path": "HMCL/build.gradle.kts",
+    "fragment": "properties"
+  },
+  {
+    "layer": "pr/experimental-channel",
+    "path": "HMCL/src/main/java/org/jackhuang/hmcl/Metadata.java",
+    "fragment": "metadata"
+  }
+]
