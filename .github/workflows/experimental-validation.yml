@@ -1,0 +1,92 @@
+name: Experimental composition validation
+
+on:
+  pull_request:
+    paths:
+      - '.github/experimental/**'
+      - '.github/scripts/**'
+      - '.github/workflows/experimental*.yml'
+  push:
+    branches: ['fix/experimental-daily']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  composition:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ['17', '25']
+        composition: [current-layers, release-20261020]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v6
+        with:
+          distribution: ${{ matrix.java == '17' && 'liberica' || 'temurin' }}
+          java-version: ${{ matrix.java }}
+          java-package: ${{ matrix.java == '17' && 'jdk+fx' || 'jdk' }}
+      - uses: gradle/actions/setup-gradle@v5
+      - name: Test resolver safety
+        run: python3 -m unittest discover -s .github/scripts -p 'test_*.py' -v
+      - name: Reproduce composition
+        env:
+          COMPOSITION: ${{ matrix.composition }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          tools="$GITHUB_WORKSPACE/.github/scripts"
+          if [[ "$COMPOSITION" == release-20261020 ]]; then
+            git worktree add --detach "$RUNNER_TEMP/composition" origin/release/20261020
+          else
+            git worktree add --detach "$RUNNER_TEMP/composition" HEAD
+          fi
+          cd "$RUNNER_TEMP/composition"
+          if [[ "$COMPOSITION" == current-layers ]]; then
+            git remote add upstream https://github.com/HMCL-dev/HMCL.git || true
+            git fetch --no-tags upstream main
+            git merge --no-edit --no-stat upstream/main
+            while IFS= read -r layer; do
+              git fetch --no-tags origin "$layer"
+              python3 "$tools/merge-layer.py" "$layer" FETCH_HEAD
+            done < <(jq -r '.layers[]' .github/experimental/layers.json)
+            # Include the download regression independently of the daily PR ranking.
+            git fetch --no-tags upstream pull/7023/head
+            git merge --no-edit --no-stat FETCH_HEAD
+          fi
+          python3 "$tools/apply-compatibility.py"
+          git log -6 --oneline >> "$GITHUB_STEP_SUMMARY"
+      - name: Verify historical download regression
+        working-directory: ${{ runner.temp }}/composition
+        env:
+          JAVA_TOOL_OPTIONS: -Djava.awt.headless=true
+        run: |
+          export GITHUB_SHA="$(git rev-parse HEAD)"
+          xvfb-run --auto-servernum ./gradlew :HMCLCore:test --tests 'org.jackhuang.hmcl.task.FetchTaskTest' --no-daemon --stacktrace
+      - name: Build or check the complete composition
+        working-directory: ${{ runner.temp }}/composition
+        env:
+          JAVA_TOOL_OPTIONS: -Djava.awt.headless=true
+          JAVA_VERSION: ${{ matrix.java }}
+        run: |
+          export GITHUB_SHA="$(git rev-parse HEAD)"
+          if [[ "$JAVA_VERSION" == 17 ]]; then
+            xvfb-run --auto-servernum ./gradlew build --no-daemon --parallel
+            python3 "$GITHUB_WORKSPACE/.github/scripts/check-experimental-artifacts.py"
+          else
+            xvfb-run --auto-servernum ./gradlew check --no-daemon --parallel
+          fi
+      - name: Upload validation reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: validation-${{ matrix.composition }}-jdk${{ matrix.java }}
+          path: |
+            ${{ runner.temp }}/composition/**/build/test-results/**/*.xml
+            ${{ runner.temp }}/composition/**/build/reports/tests/**
+          if-no-files-found: ignore
