@@ -1,0 +1,20 @@
+--- a/HMCLCore/src/test/java/org/jackhuang/hmcl/task/FetchTaskTest.java
++++ b/HMCLCore/src/test/java/org/jackhuang/hmcl/task/FetchTaskTest.java
+@@ -141,6 +141,7 @@
+                     if (responseType == ResumeResponse.OMITTED_ACCEPT_RANGES) {
+                         exchange.sendResponseHeaders(200, content.length);
+                         exchange.getResponseBody().write(content, 0, 4096);
++                        exchange.getResponseBody().flush();
+                     } else {
+                         sendContent(exchange, content, 0, 4096);
+                     }
+@@ -373,6 +374,9 @@
+             exchange.getResponseHeaders().set("Content-Range", "bytes " + offset + "-" + (content.length - 1) + "/" + content.length);
+         exchange.sendResponseHeaders(offset > 0 ? 206 : 200, length);
+         exchange.getResponseBody().write(content, offset, count);
++        // Flush the deliberate fragment before HttpServer closes an incomplete fixed-length response.
++        // Otherwise newer JDKs can discard the buffered bytes and the client has nothing to resume.
++        exchange.getResponseBody().flush();
+     }
+
+     /// Response behaviors relevant to cross-node resumption.
