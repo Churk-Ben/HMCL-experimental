@@ -66,6 +66,22 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      - name: Set up JDK 17
+        uses: actions/setup-java@v6
+        with:
+          distribution: liberica
+          java-version: '17'
+          java-package: jdk+fx
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
       - name: Compute layer conflict surface
         run: |
           set -euo pipefail
@@ -148,10 +164,29 @@ jobs:
             [ -z "$layer" ] && continue
             echo "Merging layer: $layer"
             git fetch origin "$layer"
-            git merge --no-edit FETCH_HEAD
+            python3 .github/scripts/merge-layer.py "$layer" FETCH_HEAD
           done < <(jq -r '.layers[]' .github/experimental/layers.json)
           echo "::endgroup::"
+          python3 .github/scripts/apply-compatibility.py
           base="$(git rev-parse HEAD)"
+
+          validate_composition() {
+            # Match both release environments, including the runtime used for tests.
+            export GITHUB_SHA="$(git rev-parse HEAD)"
+            # A different composition has a different SHA/version; remove stale named artifacts.
+            mkdir -p HMCL/build/libs
+            rm -f HMCL/build/libs/HMCL-*
+            JAVA_HOME="$JAVA_HOME_17_X64" xvfb-run --auto-servernum ./gradlew build --no-daemon --parallel &&
+            python3 .github/scripts/check-experimental-artifacts.py &&
+            JAVA_HOME="$JAVA_HOME_25_X64" xvfb-run --auto-servernum ./gradlew check --no-daemon --parallel
+          }
+
+          # Mandatory layers must pass on their own before considering optional PRs.
+          if ! validate_composition > /tmp/build.log 2>&1; then
+            cat /tmp/build.log
+            echo "::error::Mandatory-layer baseline failed; no release branch was pushed"
+            exit 1
+          fi
 
           excluded=""
           applied=""
@@ -179,7 +214,8 @@ jobs:
             echo "skipped:${skipped:- none}"
             echo "::endgroup::"
 
-            if xvfb-run --auto-servernum ./gradlew build --no-daemon --parallel >/tmp/build.log 2>&1; then
+            python3 .github/scripts/apply-compatibility.py
+            if validate_composition >/tmp/build.log 2>&1; then
               echo "Build passed with $(echo $applied | wc -w) pull request(s)"
               break
             fi
@@ -212,6 +248,19 @@ jobs:
           git commit -m "chore: record composition for $branch" >/dev/null 2>&1 || true
 
           git push -u origin --force-with-lease "$branch"
+
+      - name: Upload composition diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: experimental-composition-diagnostics
+          path: |
+            /tmp/build.log
+            /tmp/selection.md
+            /tmp/pool.json
+            **/build/test-results/**/*.xml
+            **/build/reports/tests/**
+          if-no-files-found: ignore
 
       - name: Trigger release
         if: ${{ success() && (github.event_name != 'workflow_dispatch' || inputs.skip_release != true) }}

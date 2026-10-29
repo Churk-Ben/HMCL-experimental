@@ -1,0 +1,16 @@
+val hmclProperties = buildList {
+    add("hmcl.version" to project.version.toString())
+    add("hmcl.add-opens" to addOpens.joinToString(" "))
+    System.getenv("GITHUB_SHA")?.let {
+        add("hmcl.version.hash" to it)
+    }
+    add("hmcl.version.type" to versionType)
+    add("hmcl.microsoft.auth.id" to microsoftAuthId)
+    add("hmcl.curseforge.apikey" to curseForgeApiKey)
+    add("hmcl.authlib-injector.version" to libs.authlib.injector.get().version!!)
+    add("hmcl.lwjgl-unsafe-agent.version" to libs.lwjgl.unsafe.agent.get().version!!)
+    if (versionType == "experimental") {
+        projectConfig.getProperty("hmcl.update_source.override")?.let { add("hmcl.update_source.override" to it) }
+        projectConfig.getProperty("hmcl.manual_update_url")?.let { add("hmcl.manual_update_url" to it) }
+    }
+}

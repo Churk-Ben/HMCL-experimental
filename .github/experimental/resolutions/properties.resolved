@@ -1,0 +1,7 @@
+val createPropertiesFile = tasks.register<WriteProperties>("createPropertiesFile") {
+    destinationFile.set(layout.buildDirectory.file("hmcl.properties"))
+    encoding = "UTF-8"
+    if (versionType == "experimental") {
+        projectConfig.getProperty("hmcl.update_source.override")?.let { property("hmcl.update_source.override", it) }
+        projectConfig.getProperty("hmcl.manual_update_url")?.let { property("hmcl.manual_update_url", it) }
+    }

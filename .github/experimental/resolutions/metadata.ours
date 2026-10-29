@@ -1,0 +1,3 @@
+    public static final String REPOSITORY_URL = "https://github.com/HMCL-dev/HMCL";
+    public static final String HMCL_UPDATE_URL = System.getProperty("hmcl.update_source.override", PUBLISH_URL + "/api/update_link");
+    public static final String MANUAL_UPDATE_URL = "https://github.com/HMCL-dev/HMCL/releases";

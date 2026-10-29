@@ -1,0 +1,8 @@
+--- a/config/project.properties
++++ b/config/project.properties
+@@ -18,3 +18,3 @@
+ versionRoot=3.17
+-hmcl.update_source.override=https://github.com/Churk-Ben/HMCL/releases/latest/download/update-exp.json
+-hmcl.manual_update_url=https://github.com/Churk-Ben/HMCL/releases
++hmcl.update_source.override=https://github.com/Churk-Ben/HMCL-experimental/releases/latest/download/update-exp.json
++hmcl.manual_update_url=https://github.com/Churk-Ben/HMCL-experimental/releases

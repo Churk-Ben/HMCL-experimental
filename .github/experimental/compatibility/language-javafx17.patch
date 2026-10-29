@@ -1,0 +1,33 @@
+--- a/HMCL/src/main/java/org/jackhuang/hmcl/ui/main/LanguageSettingsPage.java
++++ b/HMCL/src/main/java/org/jackhuang/hmcl/ui/main/LanguageSettingsPage.java
+@@ -19,7 +19,6 @@
+
+ import javafx.geometry.Insets;
+ import javafx.scene.control.ScrollPane;
+-import javafx.scene.control.Toggle;
+ import javafx.scene.control.ToggleGroup;
+ import javafx.scene.layout.VBox;
+ import org.jackhuang.hmcl.Metadata;
+@@ -30,6 +29,7 @@
+ import org.jackhuang.hmcl.ui.construct.LineRadioButton;
+ import org.jackhuang.hmcl.util.i18n.I18n;
+ import org.jackhuang.hmcl.util.i18n.SupportedLocale;
++import org.jetbrains.annotations.Nullable;
+
+ import static org.jackhuang.hmcl.setting.SettingsManager.settings;
+ import static org.jackhuang.hmcl.util.i18n.I18n.i18n;
+@@ -84,9 +84,11 @@
+                     lineRadioButton.setTitle(locale.getDisplayName(locale));
+                     languagePaneList.getContent().addAll(lineRadioButton);
+                 }
+-                toggleGroup.selectedToggleProperty().map(Toggle::getUserData).addListener(
+-                        (observable, oldValue, newValue) -> {
+-                            settings().languageProperty().set((SupportedLocale) newValue);
++                toggleGroup.selectedToggleProperty().addListener(
++                        (var observable, @Nullable var oldValue, @Nullable var newValue) -> {
++                            // JavaFX 17 has no ObservableValue.map; a cleared selection must not clear the locale.
++                            if (newValue != null)
++                                settings().languageProperty().set((SupportedLocale) newValue.getUserData());
+                         }
+                 );
+             }
