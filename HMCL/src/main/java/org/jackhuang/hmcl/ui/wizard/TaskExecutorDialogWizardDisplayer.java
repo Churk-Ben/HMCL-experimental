@@ -37,7 +37,6 @@ public abstract class TaskExecutorDialogWizardDisplayer extends AbstractWizardDi
                 return;
             }
             it.fireEvent(new DialogCloseEvent());
-            onEnd();
         });
 
         pane.setTitle(i18n("message.doing"));
@@ -82,7 +81,6 @@ public abstract class TaskExecutorDialogWizardDisplayer extends AbstractWizardDi
                             }
 
                             if (completedFailure instanceof CancellationException) {
-                                onEnd();
                                 return;
                             }
 
