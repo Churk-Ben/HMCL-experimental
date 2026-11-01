@@ -31,6 +31,7 @@ public final class UpdateChecker {
                     return false;
                 } else if (latest.force()
                         || Metadata.isNightly()
+                        || Metadata.isExperimental()
                         || latest.channel() == UpdateChannel.NIGHTLY
                         || latest.channel() != UpdateChannel.getChannel()) {
                     return !latest.version().equals(Metadata.VERSION);
