@@ -98,6 +98,9 @@ public final class ModListPage extends ListPageBase<ModListPage.ModInfoObject> i
 
     final EnumSet<ModLoaderType> supportedLoaders = EnumSet.noneOf(ModLoaderType.class);
 
+    private final BooleanProperty isLoadingMods = new SimpleBooleanProperty(false);
+    private long modLoadRequestId;
+
     /// Creates a mod list that reloads when `instanceContext` changes.
     ///
     /// @param instanceContext the parent page's instance property
@@ -127,6 +130,10 @@ public final class ModListPage extends ListPageBase<ModListPage.ModInfoObject> i
     }
 
     public void refresh() {
+        if (isLoadingMods.get()) {
+            return;
+        }
+
         loadMods(modManager);
     }
 
@@ -140,12 +147,16 @@ public final class ModListPage extends ListPageBase<ModListPage.ModInfoObject> i
     }
 
     private void loadMods(ModManager modManager) {
+        long requestId = ++modLoadRequestId;
+
         setLoading(true);
+        isLoadingMods.set(true);
 
         if (this.modManager != modManager) {
             getItems().clear();
         }
         this.modManager = modManager;
+
         CompletableFuture.supplyAsync(() -> {
             lock.lock();
             try {
@@ -157,20 +168,24 @@ public final class ModListPage extends ListPageBase<ModListPage.ModInfoObject> i
                 lock.unlock();
             }
         }, Schedulers.io()).whenCompleteAsync((list, exception) -> {
-            if (this.modManager != modManager) {
+            if (this.modManager != modManager || requestId != modLoadRequestId) {
                 return;
             }
 
-            supportedLoaders.clear();
-            supportedLoaders.addAll(modManager.getSupportedLoaders());
+            try {
+                supportedLoaders.clear();
+                supportedLoaders.addAll(modManager.getSupportedLoaders());
 
-            if (exception == null) {
-                getItems().setAll(list);
-            } else {
-                LOG.warning("Failed to load mods", exception);
-                getItems().clear();
+                if (exception == null) {
+                    getItems().setAll(list);
+                } else {
+                    LOG.warning("Failed to load mods", exception);
+                    getItems().clear();
+                }
+            } finally {
+                isLoadingMods.set(false);
+                setLoading(false);
             }
-            setLoading(false);
         }, Schedulers.javafx());
     }
 
@@ -388,9 +403,12 @@ public final class ModListPage extends ListPageBase<ModListPage.ModInfoObject> i
 
                 searchBar.getChildren().setAll(searchField, closeSearchBar);
 
+                JFXButton refreshButton = createToolbarButton2(i18n("button.refresh"), SVG.REFRESH, skinnable::refresh);
+                refreshButton.disableProperty().bind(skinnable.isLoadingMods);
+
                 // Toolbar Normal
                 toolbarNormal.getChildren().setAll(
-                        createToolbarButton2(i18n("button.refresh"), SVG.REFRESH, skinnable::refresh),
+                        refreshButton,
                         createToolbarButton2(i18n("mods.add"), SVG.ADD, skinnable::add),
                         createToolbarButton2(i18n("button.reveal_dir"), SVG.FOLDER_OPEN, skinnable::openModFolder),
                         createToolbarButton2(i18n("addon.check_update.button"), SVG.UPDATE, () ->
