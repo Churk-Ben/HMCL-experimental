@@ -91,7 +91,7 @@ final class NativeWindowDecorationTest {
                 if (environment != null) {
                     environment = environment.trim();
                 }
-                boolean expected = "true".equalsIgnoreCase(environment) ? supported
+                boolean expected = environment == null || "true".equalsIgnoreCase(environment) ? supported
                         : !"false".equalsIgnoreCase(environment) && automatic;
                 assertEquals(expected, NativeWindowDecoration.create() != null);
 
