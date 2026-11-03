@@ -25,7 +25,8 @@ package org.jackhuang.hmcl.gradle.pack;
 public enum ReleaseType {
     STABLE("stable", "hmcl", "HMCL", 100),
     DEVELOPMENT("beta", "hmcl-beta", "HMCL (Beta)", 200),
-    NIGHTLY("nightly", "hmcl-nightly", "HMCL (Nightly)", 300);
+    NIGHTLY("nightly", "hmcl-nightly", "HMCL (Nightly)", 300),
+    EXPERIMENTAL("exp", "hmcl-exp", "HMCL (Experimental)", 400);
 
     private final String name;
     private final String packageName;

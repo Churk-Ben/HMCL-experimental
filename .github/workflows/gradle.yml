@@ -44,6 +44,17 @@ jobs:
       uses: gradle/actions/setup-gradle@v5
       with:
         cache-cleanup: never
+    - name: Prepare signing key
+      shell: bash
+      env:
+        HMCL_SIGNATURE_KEY_BASE64: ${{ secrets.HMCL_SIGNATURE_KEY }}
+      run: |
+        if [ -n "${HMCL_SIGNATURE_KEY_BASE64:-}" ]; then
+          printf '%s' "$HMCL_SIGNATURE_KEY_BASE64" | base64 -d > "$RUNNER_TEMP/hmcl_signature_key.der"
+          echo "HMCL_SIGNATURE_KEY=$RUNNER_TEMP/hmcl_signature_key.der" >> "$GITHUB_ENV"
+        else
+          echo "::warning::HMCL_SIGNATURE_KEY is not configured; the build will not be signed"
+        fi
     - name: Build with Gradle
       run: xvfb-run --auto-servernum ./gradlew build --no-daemon --parallel
       env:
@@ -103,7 +114,11 @@ jobs:
           cp "$artifact" "$artifact.sha256" HMCL/build/release/
         done
         cd HMCL/build/release
-        sha256sum -- *.jar *.exe *.sh *.deb *.rpm > SHA256SUMS
+        jar_sha1="$(sha1sum "HMCL-$version.jar" | cut -d' ' -f1)"
+        printf '{"version":"%s","jar":"https://github.com/%s/releases/latest/download/HMCL-%s.jar","jarsha1":"%s"}\n' \
+          "$version" "$GITHUB_REPOSITORY" "$version" "$jar_sha1" > update-exp.json
+        cp update-exp.json update.json
+        sha256sum -- *.jar *.exe *.sh *.deb *.rpm update-exp.json update.json > SHA256SUMS
     - name: Upload release bundle
       uses: actions/upload-artifact@v7
       with:
@@ -171,7 +186,8 @@ jobs:
           latest=false
         fi
         {
-          printf 'Unofficial HMCL build from `%s`.\n\n' "$GITHUB_REF_NAME"
+          printf 'Experimental channel build from `%s`.\n\n' "$GITHUB_REF_NAME"
+          printf 'This downstream fork aggressively tracks upstream; features may be added or removed at any time.\n\n'
           printf 'Includes RPM packaging and JavaFX 27 for Java 25 or newer.\n\n'
           printf 'Commit: [%s](https://github.com/%s/commit/%s)\n\n' "$GITHUB_SHA" "$GITHUB_REPOSITORY" "$GITHUB_SHA"
           printf 'Build: https://github.com/%s/actions/runs/%s\n\n' "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
@@ -185,11 +201,11 @@ jobs:
           { printf '\n---\n\n'; cat "$composition"; } >> "$RUNNER_TEMP/RELEASE_NOTE.md"
         fi
         if gh release view "$tag" > /dev/null 2>&1; then
-          gh release upload "$tag" HMCL-* SHA256SUMS --clobber
+          gh release upload "$tag" HMCL-* SHA256SUMS update-exp.json update.json --clobber
           gh release edit "$tag" --prerelease="$RELEASE_PRERELEASE" --latest="$latest" \
             --notes-file "$RUNNER_TEMP/RELEASE_NOTE.md"
         else
-          gh release create "$tag" HMCL-* SHA256SUMS \
+          gh release create "$tag" HMCL-* SHA256SUMS update-exp.json update.json \
             --target "$GITHUB_SHA" \
             --title "HMCL $RELEASE_VERSION" \
             --notes-file "$RUNNER_TEMP/RELEASE_NOTE.md" \

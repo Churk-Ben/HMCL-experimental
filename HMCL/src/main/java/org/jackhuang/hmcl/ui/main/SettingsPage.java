@@ -105,7 +105,11 @@ public final class SettingsPage extends ScrollPane {
                     updatePane.setValue(UpdateChannel.getChannel());
 
                     updatePane.setNullSafeConverter(channel -> i18n("update.channel." + channel.channelName));
-                    updatePane.setItems(List.of(UpdateChannel.STABLE, UpdateChannel.DEVELOPMENT));
+                    // Experimental builds are pinned to their channel, like a canary release: switching back
+                    // requires reinstalling a stable or development build.
+                    updatePane.setItems(Metadata.isExperimental()
+                            ? List.of(UpdateChannel.EXPERIMENTAL)
+                            : List.of(UpdateChannel.STABLE, UpdateChannel.DEVELOPMENT));
                     updatePane.setDescriptionConverter(channel -> i18n("update.note." + channel.channelName));
 
                     final StringProperty lblUpdateSubProperty = updatePane.subtitleProperty();
@@ -144,7 +148,7 @@ public final class SettingsPage extends ScrollPane {
                     updatePaneList.getContent().add(updatePane);
                 }
 
-                {
+                if (!Metadata.isExperimental()) {
                     LineToggleButton previewPane = new LineToggleButton();
                     previewPane.setTitle(i18n("update.preview"));
                     previewPane.setSubtitle(i18n("update.preview.subtitle"));

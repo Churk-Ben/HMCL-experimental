@@ -50,8 +50,10 @@ public final class Metadata {
 
     public static final String PUBLISH_URL = "https://hmcl.huangyuhui.net";
     public static final String DOWNLOAD_URL = PUBLISH_URL + "/download";
-    public static final String HMCL_UPDATE_URL = System.getProperty("hmcl.update_source.override", PUBLISH_URL + "/api/update_link");
-    public static final String MANUAL_UPDATE_URL = "https://github.com/HMCL-dev/HMCL/releases";
+    public static final String HMCL_UPDATE_URL = System.getProperty("hmcl.update_source.override",
+            JarUtils.getAttribute("hmcl.update_source.override", PUBLISH_URL + "/api/update_link"));
+    public static final String MANUAL_UPDATE_URL = System.getProperty("hmcl.manual_update_url",
+            JarUtils.getAttribute("hmcl.manual_update_url", "https://github.com/HMCL-dev/HMCL/releases"));
 
     public static final String DOCS_URL = "https://docs.hmcl.net";
     public static final String CONTACT_URL = DOCS_URL + "/help.html";
@@ -104,8 +106,15 @@ public final class Metadata {
         return "dev".equals(BUILD_CHANNEL);
     }
 
+    /// Returns whether this build belongs to the downstream experimental channel.
+    ///
+    /// Experimental builds aggressively track upstream and may add or remove features at any time.
+    public static boolean isExperimental() {
+        return "experimental".equals(BUILD_CHANNEL);
+    }
+
     public static boolean isNightly() {
-        return !isStable() && !isDev();
+        return !isStable() && !isDev() && !isExperimental();
     }
 
     public static @Nullable String getSuggestedJavaDownloadLink() {
